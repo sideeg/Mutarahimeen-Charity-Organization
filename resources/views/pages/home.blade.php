@@ -5,14 +5,6 @@
     {{-- Swiper CSS for the Slider --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* Partner Marquee Animation */
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-50% - 1rem)); }
-        }
-        .animate-marquee {
-            animation: scroll 25s linear infinite;
-        }
         /* Custom Swiper Pagination Colors */
         .swiper-pagination-bullet { 
             background: rgba(255, 255, 255, 0.5); 
@@ -256,32 +248,42 @@
 </section>
 @endif
 
-{{-- ============ PARTNERS (Animated Marquee) ============ --}}
+{{-- ============ PARTNERS (Clean Responsive Grid) ============ --}}
 @if(isset($partners) && $partners->count())
-<section class="bg-gray-50 py-10 sm:py-16 border-y border-gray-200 overflow-hidden relative">
-    <div class="max-w-7xl mx-auto px-4 text-center mb-6 sm:mb-8 relative z-10">
-        <h3 class="text-rahma-green-800/60 font-bold text-xs sm:text-sm uppercase tracking-widest">{{ app()->getLocale()==='en' ? 'Trusted by our amazing partners' : 'شركاء النجاح الموثوقين' }}</h3>
-    </div>
-    
-    {{-- Marquee Container --}}
-    <div class="flex overflow-hidden w-full relative">
-        <div class="absolute top-0 left-0 w-12 sm:w-32 h-full bg-gradient-to-r from-gray-50 to-transparent z-10"></div>
-        <div class="absolute top-0 right-0 w-12 sm:w-32 h-full bg-gradient-to-l from-gray-50 to-transparent z-10"></div>
+<section class="bg-gray-50/70 py-14 sm:py-20 border-y border-gray-200/75 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
         
-        {{-- Inner Track --}}
-        <div class="flex gap-4 sm:gap-8 whitespace-nowrap animate-marquee px-4 items-center">
+        {{-- Section Header --}}
+        <div class="flex flex-col items-center text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+            <span class="inline-block py-1 px-3.5 rounded-full bg-rahma-gold-100 text-rahma-gold-700 font-bold text-xs uppercase tracking-wider mb-2.5">
+                {{ app()->getLocale()==='en' ? 'Our Network' : 'شبكة شركائنا' }}
+            </span>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-rahma-green-900">
+                {{ app()->getLocale()==='en' ? 'Trusted Partners & Supporters' : 'شركاء النجاح والعطاء' }}
+            </h2>
+            <p class="text-gray-500 text-xs sm:text-sm mt-2">
+                {{ app()->getLocale()==='en' ? 'Proud to collaborate with leading organizations to maximize humanitarian impact' : 'نفخر بالتعاون مع المنظمات الرائدة لتعظيم الأثر الإنساني والمجتمعي' }}
+            </p>
+        </div>
+
+        {{-- Partners Grid --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-5">
             @foreach($partners as $partner)
-                <div class="inline-flex items-center justify-center min-w-[140px] sm:min-w-[200px] h-12 sm:h-16 bg-white border border-gray-100 rounded-xl sm:rounded-2xl shadow-sm px-4 sm:px-6 text-rahma-green-700 font-black text-sm sm:text-lg grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                    {{ $partner->name }}
-                </div>
-            @endforeach
-            {{-- Duplicate for continuous loop --}}
-            @foreach($partners as $partner)
-                <div class="inline-flex items-center justify-center min-w-[140px] sm:min-w-[200px] h-12 sm:h-16 bg-white border border-gray-100 rounded-xl sm:rounded-2xl shadow-sm px-4 sm:px-6 text-rahma-green-700 font-black text-sm sm:text-lg grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                    {{ $partner->name }}
+                <div class="group bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-rahma-gold-300 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center min-h-[90px] sm:min-h-[110px] text-center">
+                    @if(isset($partner->logo_url) && $partner->logo_url)
+                        <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}" class="max-h-10 sm:max-h-12 w-auto object-contain grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300">
+                    @else
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-rahma-green-50 group-hover:bg-rahma-gold-50 text-rahma-green-700 group-hover:text-rahma-gold-600 flex items-center justify-center mb-1.5 sm:mb-2 transition-colors">
+                            <i data-lucide="building-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                        </div>
+                        <span class="font-bold text-xs sm:text-sm text-rahma-green-800 group-hover:text-rahma-green-950 transition-colors line-clamp-2">
+                            {{ $partner->name }}
+                        </span>
+                    @endif
                 </div>
             @endforeach
         </div>
+
     </div>
 </section>
 @endif
