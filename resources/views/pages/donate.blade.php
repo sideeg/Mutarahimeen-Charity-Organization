@@ -1,0 +1,188 @@
+@extends('layouts.app')
+@section('title', ($org->name ?? '') . ' | ' . (app()->getLocale()==='en' ? 'Donate' : 'تبرع الآن'))
+
+@section('content')
+
+<section class="relative bg-rahma-gradient overflow-hidden">
+    <div class="absolute inset-0 dotted-pattern"></div>
+    <div class="max-w-5xl mx-auto px-4 py-16 text-center text-white relative">
+        <h1 class="text-4xl lg:text-5xl font-black mb-4">{{ app()->getLocale()==='en' ? 'Be a Shade of Goodness' : 'كن ظلاً للخير' }}</h1>
+        <p class="text-rahma-green-50/90 max-w-2xl mx-auto">{{ app()->getLocale()==='en' ? 'Your donation changes lives. Choose how you would like to give.' : 'تبرعك يصنع الفرق. اختر طريقة الدفع المناسبة لك.' }}</p>
+    </div>
+    <svg class="w-full text-rahma-cream" viewBox="0 0 1440 60" fill="currentColor"><path d="M0,32 C480,80 960,0 1440,32 L1440,60 L0,60 Z"/></svg>
+</section>
+
+@if(session('donation_success'))
+<div class="max-w-3xl mx-auto mt-8 px-4">
+    <div class="bg-rahma-green-50 border border-rahma-green-300 text-rahma-green-800 rounded-2xl p-5 flex items-center gap-3 font-semibold">
+        <i data-lucide="check-circle" class="text-2xl text-rahma-green-600"></i>
+        {{ app()->getLocale()==='en' ? 'Thank you! Your donation request has been received.' : 'شكراً لك! تم استلام طلب التبرع بنجاح.' }}
+    </div>
+</div>
+@endif
+
+<section class="max-w-6xl mx-auto px-4 py-16 grid lg:grid-cols-5 gap-10">
+
+    {{-- Payment methods --}}
+    <div class="lg:col-span-2 space-y-6">
+        <h2 class="text-xl font-black text-rahma-green-800 mb-2">{{ app()->getLocale()==='en' ? 'Payment Methods' : 'وسائل الدفع' }}</h2>
+        @foreach($paymentMethods as $method)
+            <div class="bg-white rounded-3xl p-6 shadow-soft border-s-4 border-rahma-gold-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-11 h-11 rounded-xl bg-rahma-gold-50 flex items-center justify-center">
+                        <i data-lucide="wallet" class="text-rahma-gold-600"></i>
+                    </div>
+                    <h3 class="font-bold text-rahma-green-800">{{ $method->method_name }}</h3>
+                </div>
+                @if($method->account_number)
+                    <div class="flex justify-between text-sm bg-rahma-green-50 rounded-xl px-4 py-2 mb-2">
+                        <span class="text-rahma-green-900/60">{{ app()->getLocale()==='en' ? 'Account' : 'رقم الحساب' }}</span>
+                        <span class="font-bold text-rahma-green-800">{{ $method->account_number }}</span>
+                    </div>
+                @endif
+                <p class="text-sm text-rahma-green-900/60">{{ $method->instructions }}</p>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- Donation form --}}
+    <div class="lg:col-span-3">
+        <div class="bg-white rounded-3xl p-8 shadow-soft">
+            <h2 class="text-xl font-black text-rahma-green-800 mb-6">{{ app()->getLocale()==='en' ? 'Donation Details' : 'تفاصيل التبرع' }}</h2>
+            <form method="POST" action="{{ route('donate.store') }}" class="space-y-5">
+                @csrf
+                <div class="grid sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Full Name' : 'الاسم الكامل' }}</label>
+                        <input type="text" name="donor_name" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Phone' : 'رقم الهاتف' }}</label>
+                        <input type="text" name="phone" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Email' : 'البريد الإلكتروني' }}</label>
+                    <input type="email" name="email" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Amount' : 'المبلغ' }}</label>
+                        <input type="number" name="amount" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Project (optional)' : 'المشروع (اختياري)' }}</label>
+                        <select name="project_id" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                            <option value="">{{ app()->getLocale()==='en' ? 'General Fund' : 'صندوق عام' }}</option>
+                            @foreach($projects as $p)
+                                <option value="{{ $p->id }}">{{ $p->title_ar }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-2 block">{{ app()->getLocale()==='en' ? 'Payment Method' : 'طريقة الدفع' }}</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        @foreach(['bankak'=>'بنكك','fawri'=>'فوري','mycash'=>'MyCash','bank_transfer'=>'تحويل بنكي'] as $key => $label)
+                            <label class="cursor-pointer">
+                                <input type="radio" name="payment_method" value="{{ $key }}" class="peer hidden" {{ $loop->first ? 'checked' : '' }}>
+                                <div class="text-center text-sm font-bold py-3 rounded-xl border-2 border-rahma-green-100 peer-checked:border-rahma-gold-500 peer-checked:bg-rahma-gold-50 peer-checked:text-rahma-gold-700 text-rahma-green-700 transition">
+                                    {{ $label }}
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-2 block">{{ app()->getLocale()==='en' ? 'Donation Type' : 'نوع التبرع' }}</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="donation_type" value="one_time" class="peer hidden" checked>
+                            <div class="text-center text-sm font-bold py-3 rounded-xl border-2 border-rahma-green-100 peer-checked:border-rahma-green-500 peer-checked:bg-rahma-green-50 peer-checked:text-rahma-green-700 text-rahma-green-700 transition">{{ app()->getLocale()==='en' ? 'One-time' : 'مرة واحدة' }}</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="donation_type" value="recurring" class="peer hidden">
+                            <div class="text-center text-sm font-bold py-3 rounded-xl border-2 border-rahma-green-100 peer-checked:border-rahma-green-500 peer-checked:bg-rahma-green-50 peer-checked:text-rahma-green-700 text-rahma-green-700 transition">{{ app()->getLocale()==='en' ? 'Recurring' : 'شهري متكرر' }}</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Transaction Reference (optional)' : 'رقم العملية (اختياري)' }}</label>
+                    <input type="text" name="transaction_reference" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                </div>
+
+                <button type="submit" class="w-full bg-rahma-gradient text-white font-bold py-4 rounded-full shadow-soft hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
+                    <i data-lucide="heart-handshake"></i> {{ app()->getLocale()==='en' ? 'Submit Donation' : 'إرسال التبرع' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{{-- Volunteer section --}}
+<section id="volunteer" class="bg-rahma-green-50/60 py-20">
+    <div class="max-w-4xl mx-auto px-4">
+        @if(session('volunteer_success'))
+        <div class="bg-rahma-green-100 border border-rahma-green-300 text-rahma-green-800 rounded-2xl p-5 flex items-center gap-3 font-semibold mb-8">
+            <i data-lucide="check-circle" class="text-2xl text-rahma-green-600"></i>
+            {{ app()->getLocale()==='en' ? 'Thank you for volunteering! We will contact you soon.' : 'شكراً لتطوعك! سنتواصل معك قريباً.' }}
+        </div>
+        @endif
+        <div class="text-center mb-10">
+            <span class="text-rahma-gold-600 font-bold text-sm">{{ app()->getLocale()==='en' ? 'Give Your Time' : 'وقتك أيضاً عطاء' }}</span>
+            <h2 class="text-3xl font-black text-rahma-green-800 mt-2">{{ app()->getLocale()==='en' ? 'Become a Volunteer' : 'تطوع معنا' }}</h2>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 shadow-soft">
+            <form method="POST" action="{{ route('volunteer.store') }}" class="space-y-5">
+                @csrf
+                <div class="grid sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Full Name' : 'الاسم الكامل' }}</label>
+                        <input type="text" name="full_name" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Phone' : 'رقم الهاتف' }}</label>
+                        <input type="text" name="phone" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Email' : 'البريد الإلكتروني' }}</label>
+                    <input type="email" name="email" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                </div>
+                <div class="grid sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-2 block">{{ app()->getLocale()==='en' ? 'Volunteer Type' : 'نوع التطوع' }}</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="volunteer_type" value="professional" class="peer hidden" checked>
+                                <div class="text-center text-sm font-bold py-3 rounded-xl border-2 border-rahma-green-100 peer-checked:border-rahma-gold-500 peer-checked:bg-rahma-gold-50 peer-checked:text-rahma-gold-700 text-rahma-green-700 transition">{{ app()->getLocale()==='en' ? 'Professional' : 'مهني' }}</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="volunteer_type" value="digital" class="peer hidden">
+                                <div class="text-center text-sm font-bold py-3 rounded-xl border-2 border-rahma-green-100 peer-checked:border-rahma-gold-500 peer-checked:bg-rahma-gold-50 peer-checked:text-rahma-gold-700 text-rahma-green-700 transition">{{ app()->getLocale()==='en' ? 'Digital' : 'رقمي' }}</div>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Specialization' : 'التخصص' }}</label>
+                        <input type="text" name="specialization" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Message / Skills' : 'رسالتك / مهاراتك' }}</label>
+                    <textarea name="message_or_skills" rows="4" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-rahma-gold-gradient text-white font-bold py-4 rounded-full shadow-soft hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
+                    <i data-lucide="send"></i> {{ app()->getLocale()==='en' ? 'Apply Now' : 'إرسال الطلب' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+@endsection
