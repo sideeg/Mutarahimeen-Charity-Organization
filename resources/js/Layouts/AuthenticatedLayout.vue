@@ -36,15 +36,15 @@ const logout = () => {
 
 <template>
     <div class="min-h-screen bg-slate-50 flex" dir="rtl">
-        <!-- Desktop Sidebar -->
+        <!-- ================= DESKTOP SIDEBAR ================= -->
         <aside
             class="hidden md:flex flex-col w-64 bg-slate-900 text-white fixed h-full z-20"
         >
             <div
                 class="h-16 flex items-center justify-center border-b border-slate-800 px-6 gap-2"
             >
-                <HeartHandshake class="text-orange-500 w-8 h-8" />
-                <span class="font-bold text-lg"> متراحمين الخيرية</span>
+                <HeartHandshake class="text-orange-500 w-8 h-8 flex-shrink-0" />
+                <span class="font-bold text-lg truncate">متراحمين الخيرية</span>
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
@@ -107,7 +107,7 @@ const logout = () => {
                     <span>لافتات الواجهة (Hero)</span>
                 </Link>
 
-                <!-- Social Links (Admin & Editor) -->
+                <!-- Social Links -->
                 <Link
                     v-if="
                         ['super_admin', 'content_editor'].includes(
@@ -125,7 +125,7 @@ const logout = () => {
                     <span>حسابات التواصل</span>
                 </Link>
 
-                <!-- Partners (Admin & Editor) -->
+                <!-- Partners -->
                 <Link
                     v-if="
                         ['super_admin', 'content_editor'].includes(
@@ -296,6 +296,7 @@ const logout = () => {
                     <span>إدارة المشرفين</span>
                 </Link>
             </nav>
+
             <div class="p-4 border-t border-slate-800">
                 <button
                     @click="logout"
@@ -307,77 +308,196 @@ const logout = () => {
             </div>
         </aside>
 
-        <!-- Mobile Navigation Bar -->
+        <!-- ================= MOBILE NAVIGATION BAR ================= -->
         <div
-            class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-4 flex items-center justify-between z-30"
+            class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-4 flex items-center justify-between z-30 shadow-sm"
         >
             <button
                 @click="isMobileSidebarOpen = true"
-                class="p-2 text-slate-600"
+                class="p-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+                aria-label="فتح القائمة"
             >
                 <Menu class="w-6 h-6" />
             </button>
             <div class="flex items-center gap-2">
                 <HeartHandshake class="text-orange-500 w-6 h-6" />
-                <span class="font-bold text-slate-800">متراحمين الخيرية </span>
+                <span class="font-bold text-slate-800">متراحمين الخيرية</span>
             </div>
-            <div class="w-6"></div>
+            <div class="w-8"></div>
         </div>
 
-        <!-- Mobile Sidebar Drawer -->
+        <!-- ================= MOBILE SIDEBAR DRAWER (Full Menu) ================= -->
         <div
             v-if="isMobileSidebarOpen"
-            class="fixed inset-0 z-40 md:hidden flex"
+            class="fixed inset-0 z-50 md:hidden flex"
         >
+            <!-- Backdrop -->
             <div
-                class="fixed inset-0 bg-slate-900/60"
+                class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
                 @click="isMobileSidebarOpen = false"
             ></div>
+
+            <!-- Drawer Panel -->
             <aside
-                class="relative flex flex-col w-64 bg-slate-950 text-white h-full z-10 p-6"
+                class="relative flex flex-col w-72 max-w-[85vw] bg-slate-950 text-white h-full z-10 shadow-2xl"
             >
-                <button
-                    @click="isMobileSidebarOpen = false"
-                    class="absolute top-4 left-4 p-2 text-slate-300"
+                <!-- Drawer Header -->
+                <div
+                    class="flex items-center justify-between px-5 py-4 border-b border-slate-800"
                 >
-                    <X class="w-6 h-6" />
-                </button>
-                <div class="flex items-center gap-2 mb-8 mt-4">
-                    <HeartHandshake class="text-orange-500 w-8 h-8" />
-                    <span class="font-bold text-lg">لوحة الإدارة</span>
+                    <div class="flex items-center gap-2.5">
+                        <HeartHandshake class="text-orange-500 w-7 h-7" />
+                        <span class="font-bold text-base text-white"
+                            >لوحة الإدارة</span
+                        >
+                    </div>
+                    <button
+                        @click="isMobileSidebarOpen = false"
+                        class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+                    >
+                        <X class="w-5 h-5" />
+                    </button>
                 </div>
 
-                <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <!-- Drawer Navigation Links -->
+                <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
                     <!-- Dashboard Home -->
                     <Link
                         href="/admin"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component === 'Index',
+                        }"
                         @click="isMobileSidebarOpen = false"
                     >
                         <LayoutDashboard class="w-5 h-5" />
                         <span>الرئيسية</span>
                     </Link>
 
-                    <!-- Profile Settings -->
+                    <!-- Org Profile Editor -->
                     <Link
                         v-if="$page.props.auth?.user?.role === 'super_admin'"
                         href="/admin/profile"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Profile/'),
+                        }"
                         @click="isMobileSidebarOpen = false"
                     >
                         <Building2 class="w-5 h-5" />
                         <span>ملف المنظمة</span>
                     </Link>
 
-                    <!-- Platform Settings -->
+                    <!-- Site Settings -->
                     <Link
                         v-if="$page.props.auth?.user?.role === 'super_admin'"
                         href="/admin/settings"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Settings/'),
+                        }"
                         @click="isMobileSidebarOpen = false"
                     >
                         <Settings class="w-5 h-5" />
                         <span>إعدادات المنصة</span>
+                    </Link>
+
+                    <!-- Slides Manager -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'content_editor'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/hero-slides"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('HeroSlides/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <SlidersHorizontal class="w-5 h-5" />
+                        <span>لافتات الواجهة (Hero)</span>
+                    </Link>
+
+                    <!-- Social Links -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'content_editor'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/social-links"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('SocialLinks/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <Share2 class="w-5 h-5" />
+                        <span>حسابات التواصل</span>
+                    </Link>
+
+                    <!-- Partners -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'content_editor'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/partners"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Partners/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <Handshake class="w-5 h-5" />
+                        <span>شركاء النجاح</span>
+                    </Link>
+
+                    <!-- News -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'content_editor'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/news"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('News/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <Newspaper class="w-5 h-5" />
+                        <span>الأخبار والفعاليات</span>
+                    </Link>
+
+                    <!-- Impact Stats -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'content_editor'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/impact-stats"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('ImpactStats/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <TrendingUp class="w-5 h-5" />
+                        <span>إحصائيات الأثر</span>
                     </Link>
 
                     <!-- Volunteers -->
@@ -388,7 +508,11 @@ const logout = () => {
                             )
                         "
                         href="/admin/volunteers"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Volunteers/'),
+                        }"
                         @click="isMobileSidebarOpen = false"
                     >
                         <UserCheck class="w-5 h-5" />
@@ -398,11 +522,72 @@ const logout = () => {
                     <!-- Projects -->
                     <Link
                         href="/admin/projects"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Projects/'),
+                        }"
                         @click="isMobileSidebarOpen = false"
                     >
                         <FolderHeart class="w-5 h-5" />
                         <span>إدارة المشاريع</span>
+                    </Link>
+
+                    <!-- Categories -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'content_editor'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/categories"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Categories/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <FolderClosed class="w-5 h-5" />
+                        <span>تصنيفات المشاريع</span>
+                    </Link>
+
+                    <!-- Updates -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'content_editor'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/updates"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Updates/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <FileText class="w-5 h-5" />
+                        <span>تحديثات المشاريع</span>
+                    </Link>
+
+                    <!-- Payment Methods -->
+                    <Link
+                        v-if="
+                            ['super_admin', 'finance'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
+                        href="/admin/payment-methods"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('PaymentMethods/'),
+                        }"
+                        @click="isMobileSidebarOpen = false"
+                    >
+                        <CreditCard class="w-5 h-5" />
+                        <span>الحسابات المصرفية</span>
                     </Link>
 
                     <!-- Donations -->
@@ -413,7 +598,11 @@ const logout = () => {
                             )
                         "
                         href="/admin/donations"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Donations/'),
+                        }"
                         @click="isMobileSidebarOpen = false"
                     >
                         <Coins class="w-5 h-5" />
@@ -424,26 +613,34 @@ const logout = () => {
                     <Link
                         v-if="$page.props.auth?.user?.role === 'super_admin'"
                         href="/admin/users"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition"
+                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
+                        :class="{
+                            'bg-slate-800 text-orange-500 font-bold':
+                                $page.component.startsWith('Users/'),
+                        }"
                         @click="isMobileSidebarOpen = false"
                     >
                         <UsersRound class="w-5 h-5" />
                         <span>إدارة المشرفين</span>
                     </Link>
                 </nav>
-                <button
-                    @click="logout"
-                    class="flex w-full items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-950/50 text-red-400 mt-auto cursor-pointer"
-                >
-                    <LogOut class="w-5 h-5" />
-                    <span>الخروج</span>
-                </button>
+
+                <!-- Drawer Logout Button -->
+                <div class="p-3 border-t border-slate-800 bg-slate-950">
+                    <button
+                        @click="logout"
+                        class="flex w-full items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-red-950/50 text-red-400 transition cursor-pointer text-sm"
+                    >
+                        <LogOut class="w-5 h-5" />
+                        <span>تسجيل الخروج</span>
+                    </button>
+                </div>
             </aside>
         </div>
 
-        <!-- Page Body Wrapper -->
+        <!-- ================= PAGE BODY WRAPPER ================= -->
         <main class="flex-1 md:mr-64 pt-16 md:pt-0 min-h-screen">
-            <!-- Navbar header -->
+            <!-- Navbar Header (Desktop) -->
             <header
                 class="hidden md:flex h-16 bg-white border-b border-slate-200 px-8 items-center justify-between"
             >
@@ -458,7 +655,7 @@ const logout = () => {
             </header>
 
             <!-- Content View Slot -->
-            <div class="p-6 md:p-8">
+            <div class="p-4 sm:p-6 md:p-8">
                 <slot />
             </div>
         </main>
