@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
 import { ref } from "vue";
-import { Eye, Trash2, Plus } from "lucide-vue-next";
+import { Eye, Trash2, Plus, FileSpreadsheet } from "lucide-vue-next";
 
 defineProps({
     applications: Array,
@@ -52,13 +52,22 @@ const deleteApplication = (id) => {
                     الجمعية.
                 </p>
             </div>
-            <Link
-                href="/admin/volunteers/create"
-                class="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-lg font-bold text-sm hover:bg-orange-600 transition shadow-sm cursor-pointer self-start"
-            >
-                <Plus class="w-4 h-4" />
-                <span>إضافة متطوع جديد</span>
-            </Link>
+            <div class="flex items-center gap-3 self-start">
+                <a
+                    href="/admin/volunteers/export"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg font-bold text-sm hover:bg-emerald-700 transition shadow-sm cursor-pointer"
+                >
+                    <FileSpreadsheet class="w-4 h-4" />
+                    <span>تصدير Excel</span>
+                </a>
+                <Link
+                    href="/admin/volunteers/create"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-lg font-bold text-sm hover:bg-orange-600 transition shadow-sm cursor-pointer"
+                >
+                    <Plus class="w-4 h-4" />
+                    <span>إضافة متطوع جديد</span>
+                </Link>
+            </div>
         </div>
 
         <div
@@ -71,6 +80,7 @@ const deleteApplication = (id) => {
                     >
                         <th class="py-4 px-6">المتطوع والمؤهل</th>
                         <th class="py-4 px-6">بيانات الاتصال</th>
+                        <th class="py-4 px-6">مكان الإقامة</th>
                         <th class="py-4 px-6">تخصص المساهمة</th>
                         <th class="py-4 px-6 text-center">حالة الطلب</th>
                         <th class="py-4 px-6 text-center">مراجعة</th>
@@ -91,11 +101,18 @@ const deleteApplication = (id) => {
                             }}</span>
                             <span
                                 class="block text-[10px] text-slate-400 mt-0.5"
+                                >واتساب: {{ app.whatsapp }}</span
+                            >
+                            <span
+                                class="block text-[10px] text-slate-400 mt-0.5"
                                 >{{ app.email }}</span
                             >
                         </td>
+                        <td class="py-4 px-6 text-slate-600">
+                            {{ app.residence_state }}
+                        </td>
                         <td class="py-4 px-6 font-semibold text-slate-600">
-                            {{ app.specialization || app.volunteer_type }}
+                            {{ app.specialization || "—" }}
                         </td>
                         <td class="py-4 px-6 text-center">
                             <span
@@ -193,17 +210,25 @@ const deleteApplication = (id) => {
                         </div>
                         <div>
                             <span class="text-slate-400 block mb-0.5"
-                                >نوع المساهمة</span
+                                >مكان الإقامة</span
                             >
                             <strong class="text-slate-700 text-sm">{{
-                                activeAppDetail.volunteer_type
+                                activeAppDetail.residence_state
+                            }}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block mb-0.5"
+                                >الواتساب</span
+                            >
+                            <strong class="text-slate-700 text-sm font-mono">{{
+                                activeAppDetail.whatsapp
                             }}</strong>
                         </div>
                     </div>
 
                     <div>
                         <span class="text-slate-400 text-xs block mb-1"
-                            >المهارات والخبرات السابقة</span
+                            >الخبرة والأعمال الإنسانية السابقة</span
                         >
                         <div
                             class="p-3 bg-slate-50 rounded-lg border border-slate-150 text-xs text-slate-600 min-h-[96px]"

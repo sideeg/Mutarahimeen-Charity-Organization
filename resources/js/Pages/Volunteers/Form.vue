@@ -3,14 +3,36 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useForm, Link } from "@inertiajs/vue3";
 import { ArrowRight, Save } from "lucide-vue-next";
 
+const sudanStates = [
+    "الخرطوم",
+    "الجزيرة",
+    "النيل الأبيض",
+    "النيل الأزرق",
+    "سنار",
+    "كسلا",
+    "البحر الأحمر",
+    "نهر النيل",
+    "الشمالية",
+    "شمال كردفان",
+    "جنوب كردفان",
+    "غرب كردفان",
+    "شمال دارفور",
+    "جنوب دارفور",
+    "شرق دارفور",
+    "غرب دارفور",
+    "وسط دارفور",
+    "القضارف",
+];
+
 const form = useForm({
     full_name: "",
     email: "",
     phone: "",
-    volunteer_type: "professional",
+    whatsapp: "",
+    residence_state: "",
     specialization: "",
     message_or_skills: "",
-    status: "accepted", // Default manually added volunteers as accepted/verified
+    status: "accepted",
 });
 
 const submit = () => {
@@ -111,45 +133,76 @@ const submit = () => {
                     <div>
                         <label
                             class="block text-sm font-semibold text-slate-700 mb-2"
-                            >نوع التطوع والمساهمة *</label
+                            >رقم الواتساب *</label
                         >
-                        <select
-                            v-model="form.volunteer_type"
+                        <input
+                            type="tel"
+                            v-model="form.whatsapp"
                             required
-                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
-                        >
-                            <option value="professional">
-                                تطوع مهني ميداني
-                            </option>
-                            <option value="digital">تطوع رقمي (عن بعد)</option>
-                        </select>
+                            pattern="[0-9]{9,15}"
+                            title="يرجى إدخال رقم واتساب صحيح."
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none text-left"
+                            dir="ltr"
+                        />
                         <p
-                            v-if="form.errors.volunteer_type"
+                            v-if="form.errors.whatsapp"
                             class="text-xs text-red-500 mt-1"
                         >
-                            {{ form.errors.volunteer_type }}
+                            {{ form.errors.whatsapp }}
                         </p>
                     </div>
                     <div>
                         <label
                             class="block text-sm font-semibold text-slate-700 mb-2"
-                            >التخصص الوظيفي / المهارة</label
+                            >مكان الإقامة *</label
                         >
-                        <input
-                            type="text"
-                            v-model="form.specialization"
-                            pattern="^[\p{L}\s',\d\-]+$"
-                            title="يرجى إدخال تخصص صحيح بشكل نصي."
+                        <select
+                            v-model="form.residence_state"
+                            required
                             class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
-                            placeholder="مثال: طبيب، مصمم جرافيك..."
-                        />
+                        >
+                            <option value="" disabled>
+                                اختر الولاية أو خارج السودان
+                            </option>
+                            <optgroup label="داخل السودان">
+                                <option
+                                    v-for="state in sudanStates"
+                                    :key="state"
+                                    :value="state"
+                                >
+                                    {{ state }}
+                                </option>
+                            </optgroup>
+                            <option value="خارج السودان">خارج السودان</option>
+                        </select>
                         <p
-                            v-if="form.errors.specialization"
+                            v-if="form.errors.residence_state"
                             class="text-xs text-red-500 mt-1"
                         >
-                            {{ form.errors.specialization }}
+                            {{ form.errors.residence_state }}
                         </p>
                     </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-sm font-semibold text-slate-700 mb-2"
+                        >التخصص الوظيفي / المهارة</label
+                    >
+                    <input
+                        type="text"
+                        v-model="form.specialization"
+                        pattern="^[\p{L}\s',\d\-]+$"
+                        title="يرجى إدخال تخصص صحيح بشكل نصي."
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
+                        placeholder="مثال: طبيب، مصمم جرافيك..."
+                    />
+                    <p
+                        v-if="form.errors.specialization"
+                        class="text-xs text-red-500 mt-1"
+                    >
+                        {{ form.errors.specialization }}
+                    </p>
                 </div>
 
                 <div>
@@ -173,15 +226,15 @@ const submit = () => {
                 <div>
                     <label
                         class="block text-sm font-semibold text-slate-700 mb-2"
-                        >ملاحظات عن المهارات أو كيفية المساعدة *</label
+                        >الخبرة والأعمال الإنسانية السابقة *</label
                     >
                     <textarea
                         v-model="form.message_or_skills"
                         required
                         rows="4"
                         minlength="10"
-                        title="يرجى إدخال رسالة لا تقل عن 10 حروف تصف المهارات."
-                        placeholder="اكتب مهارات المتطوع أو سياق المساعدة المتفق عليها للتوثيق المرجعي..."
+                        title="يرجى إدخال وصف لا يقل عن 10 حروف عن الخبرة والأعمال السابقة."
+                        placeholder="اذكر خبراتك السابقة، الأعمال التطوعية أو الإنسانية التي شاركت بها، والجهات التي عملت معها إن وجدت..."
                         class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
                     ></textarea>
                     <p

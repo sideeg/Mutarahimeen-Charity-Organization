@@ -63,7 +63,8 @@ class DonationController extends Controller
             'full_name'         => 'required|string|max:120',
             'email'             => 'required|email|max:180',
             'phone'             => 'required|string|max:30',
-            'volunteer_type'    => 'required|in:professional,digital',
+            'whatsapp'          => 'required|string|max:30',
+            'residence_state'   => 'required|string|max:100',
             'specialization'    => 'nullable|string|max:120',
             'message_or_skills' => 'required|string|max:1000',
         ]);

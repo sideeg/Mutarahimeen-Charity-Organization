@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\VolunteerApplication;
 use App\Models\DashboardUser;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VolunteerApplicationController extends Controller
 {
@@ -24,14 +25,12 @@ class VolunteerApplicationController extends Controller
         return inertia('Volunteers/Index', ['applications' => $applications]);
     }
 
-    /** Display the Volunteer Creation Form */
     public function create()
     {
         $this->authorizeEditor();
         return inertia('Volunteers/Form', ['application' => null]);
     }
 
-    /** Store a manually added Volunteer record */
     public function store(Request $request)
     {
         $this->authorizeEditor();
@@ -40,7 +39,8 @@ class VolunteerApplicationController extends Controller
             'full_name'         => 'required|string|max:120',
             'email'             => 'required|email|max:180',
             'phone'             => 'required|string|max:30',
-            'volunteer_type'    => 'required|in:professional,digital',
+            'whatsapp'          => 'required|string|max:30',
+            'residence_state'   => 'required|string|max:100',
             'specialization'    => 'nullable|string|max:120',
             'message_or_skills' => 'required|string|max:1000',
             'status'            => 'required|in:new,accepted,rejected',
@@ -48,7 +48,9 @@ class VolunteerApplicationController extends Controller
             'full_name.required'         => 'الاسم الكامل مطلوب.',
             'email.required'             => 'البريد الإلكتروني مطلوب.',
             'phone.required'             => 'رقم الهاتف مطلوب.',
-            'message_or_skills.required' => 'يرجى كتابة المهارات أو كيفية المساهمة.',
+            'whatsapp.required'          => 'رقم الواتساب مطلوب.',
+            'residence_state.required'   => 'مكان الإقامة مطلوب.',
+            'message_or_skills.required' => 'يرجى كتابة الخبرة والأعمال الإنسانية السابقة.',
         ]);
 
         VolunteerApplication::create($validated);
@@ -74,5 +76,62 @@ class VolunteerApplicationController extends Controller
         $this->authorizeEditor();
         $application->delete();
         return redirect('/admin/volunteers')->with('success', 'تم حذف طلب التطوع بنجاح');
+    }
+
+    /** Export all volunteer applications as an Excel-openable CSV file */
+    public function export(): StreamedResponse
+    {
+        $this->authorizeEditor();
+
+        $applications = VolunteerApplication::orderByDesc('id')->get();
+
+        $filename = 'volunteer_applications_' . now()->format('Y_m_d_His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $columns = [
+            'الاسم الكامل',
+            'البريد الإلكتروني',
+            'الهاتف',
+            'الواتساب',
+            'مكان الإقامة',
+            'التخصص',
+            'الخبرة والأعمال الإنسانية السابقة',
+            'الحالة',
+            'تاريخ التسجيل',
+        ];
+
+        $callback = function () use ($applications, $columns) {
+            $file = fopen('php://output', 'w');
+            // UTF-8 BOM so Excel renders Arabic correctly
+            fwrite($file, "\xEF\xBB\xBF");
+            fputcsv($file, $columns);
+
+            foreach ($applications as $app) {
+                fputcsv($file, [
+                    $app->full_name,
+                    $app->email,
+                    $app->phone,
+                    $app->whatsapp,
+                    $app->residence_state,
+                    $app->specialization,
+                    $app->message_or_skills,
+                    match ($app->status) {
+                        'new' => 'جديد',
+                        'accepted' => 'مقبول',
+                        'rejected' => 'مرفوض',
+                        default => $app->status,
+                    },
+                    $app->created_at,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->streamDownload($callback, $filename, $headers);
     }
 }

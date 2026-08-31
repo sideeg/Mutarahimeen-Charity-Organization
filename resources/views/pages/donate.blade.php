@@ -150,33 +150,43 @@
                         <input type="text" name="phone" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
                     </div>
                 </div>
+
+                <div class="grid sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'WhatsApp Number' : 'رقم الواتساب' }}</label>
+                        <input type="text" name="whatsapp" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400" dir="ltr">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Residence' : 'مكان الإقامة' }}</label>
+                        <select name="residence_state" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
+                            <option value="" disabled selected>{{ app()->getLocale()==='en' ? 'Select state' : 'اختر الولاية' }}</option>
+                            <optgroup label="{{ app()->getLocale()==='en' ? 'Inside Sudan' : 'داخل السودان' }}">
+                                @foreach(['الخرطوم','الجزيرة','النيل الأبيض','النيل الأزرق','سنار','كسلا','البحر الأحمر','نهر النيل','الشمالية','شمال كردفان','جنوب كردفان','غرب كردفان','شمال دارفور','جنوب دارفور','شرق دارفور','غرب دارفور','وسط دارفور','القضارف'] as $state)
+                                    <option value="{{ $state }}">{{ $state }}</option>
+                                @endforeach
+                            </optgroup>
+                            <option value="خارج السودان">{{ app()->getLocale()==='en' ? 'Outside Sudan' : 'خارج السودان' }}</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div>
                     <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Email' : 'البريد الإلكتروني' }}</label>
                     <input type="email" name="email" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
                 </div>
-                <div class="grid sm:grid-cols-2 gap-5">
-                    <div>
-                        <label class="text-sm font-semibold text-rahma-green-800 mb-2 block">{{ app()->getLocale()==='en' ? 'Volunteer Type' : 'نوع التطوع' }}</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="volunteer_type" value="professional" class="peer hidden" checked>
-                                <div class="text-center text-sm font-bold py-3 rounded-xl border-2 border-rahma-green-100 peer-checked:border-rahma-gold-500 peer-checked:bg-rahma-gold-50 peer-checked:text-rahma-gold-700 text-rahma-green-700 transition">{{ app()->getLocale()==='en' ? 'Professional' : 'مهني' }}</div>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="volunteer_type" value="digital" class="peer hidden">
-                                <div class="text-center text-sm font-bold py-3 rounded-xl border-2 border-rahma-green-100 peer-checked:border-rahma-gold-500 peer-checked:bg-rahma-gold-50 peer-checked:text-rahma-gold-700 text-rahma-green-700 transition">{{ app()->getLocale()==='en' ? 'Digital' : 'رقمي' }}</div>
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Specialization' : 'التخصص' }}</label>
-                        <input type="text" name="specialization" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
-                    </div>
-                </div>
+
                 <div>
-                    <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Message / Skills' : 'رسالتك / مهاراتك' }}</label>
-                    <textarea name="message_or_skills" rows="4" required class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400"></textarea>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Specialization' : 'التخصص' }}</label>
+                    <input type="text" name="specialization" class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400">
                 </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-rahma-green-800 mb-1 block">{{ app()->getLocale()==='en' ? 'Your Experience & Past Humanitarian Work' : 'خبرتك وأعمالك الإنسانية السابقة' }}</label>
+                    <textarea name="message_or_skills" rows="4" required
+                        placeholder="{{ app()->getLocale()==='en' ? 'Describe your experience, previous volunteer or humanitarian work, and organizations you worked with...' : 'اذكر خبراتك، أعمالك التطوعية أو الإنسانية السابقة، والجهات التي عملت معها إن وجدت...' }}"
+                        class="w-full rounded-xl border border-rahma-green-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rahma-green-400"></textarea>
+                </div>
+
                 <button type="submit" class="w-full bg-rahma-gold-gradient text-white font-bold py-4 rounded-full shadow-soft hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
                     <i data-lucide="send"></i> {{ app()->getLocale()==='en' ? 'Apply Now' : 'إرسال الطلب' }}
                 </button>
