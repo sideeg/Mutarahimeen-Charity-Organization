@@ -18,11 +18,29 @@ class VolunteerApplicationController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $this->authorizeEditor();
-        $applications = VolunteerApplication::orderByDesc('id')->get();
-        return inertia('Volunteers/Index', ['applications' => $applications]);
+
+        $applications = VolunteerApplication::query()
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('member_type'), fn ($q) => $q->where('member_type', $request->member_type))
+            ->when($request->filled('residence_state'), fn ($q) => $q->where('residence_state', $request->residence_state))
+            ->orderByDesc('id')
+            ->get();
+
+        // Distinct residence states currently in the table, for the filter dropdown
+        $residenceStates = VolunteerApplication::query()
+            ->whereNotNull('residence_state')
+            ->distinct()
+            ->orderBy('residence_state')
+            ->pluck('residence_state');
+
+        return inertia('Volunteers/Index', [
+            'applications'    => $applications,
+            'residenceStates' => $residenceStates,
+            'filters'         => $request->only(['status', 'member_type', 'residence_state']),
+        ]);
     }
 
     public function create()
@@ -44,6 +62,7 @@ class VolunteerApplicationController extends Controller
             'specialization'    => 'nullable|string|max:120',
             'message_or_skills' => 'required|string|max:1000',
             'status'            => 'required|in:new,accepted,rejected',
+            'member_type'       => 'required|in:member,volunteer',
         ], [
             'full_name.required'         => 'الاسم الكامل مطلوب.',
             'email.required'             => 'البريد الإلكتروني مطلوب.',
@@ -78,12 +97,17 @@ class VolunteerApplicationController extends Controller
         return redirect('/admin/volunteers')->with('success', 'تم حذف طلب التطوع بنجاح');
     }
 
-    /** Export all volunteer applications as an Excel-openable CSV file */
-    public function export(): StreamedResponse
+    /** Export volunteer applications as an Excel-openable CSV file, respecting active filters */
+    public function export(Request $request): StreamedResponse
     {
         $this->authorizeEditor();
 
-        $applications = VolunteerApplication::orderByDesc('id')->get();
+        $applications = VolunteerApplication::query()
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('member_type'), fn ($q) => $q->where('member_type', $request->member_type))
+            ->when($request->filled('residence_state'), fn ($q) => $q->where('residence_state', $request->residence_state))
+            ->orderByDesc('id')
+            ->get();
 
         $filename = 'volunteer_applications_' . now()->format('Y_m_d_His') . '.csv';
 
@@ -101,12 +125,12 @@ class VolunteerApplicationController extends Controller
             'التخصص',
             'الخبرة والأعمال الإنسانية السابقة',
             'الحالة',
+            'النوع',
             'تاريخ التسجيل',
         ];
 
         $callback = function () use ($applications, $columns) {
             $file = fopen('php://output', 'w');
-            // UTF-8 BOM so Excel renders Arabic correctly
             fwrite($file, "\xEF\xBB\xBF");
             fputcsv($file, $columns);
 
@@ -125,6 +149,7 @@ class VolunteerApplicationController extends Controller
                         'rejected' => 'مرفوض',
                         default => $app->status,
                     },
+                    $app->member_type === 'member' ? 'عضو' : 'متطوع',
                     $app->created_at,
                 ]);
             }

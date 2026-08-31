@@ -33,6 +33,7 @@ const form = useForm({
     specialization: "",
     message_or_skills: "",
     status: "accepted",
+    member_type: "volunteer",
 });
 
 const submit = () => {
@@ -221,6 +222,27 @@ const submit = () => {
                         </option>
                         <option value="rejected">مرفوض</option>
                     </select>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-sm font-semibold text-slate-700 mb-2"
+                        >تصنيف المسجل *</label
+                    >
+                    <select
+                        v-model="form.member_type"
+                        required
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
+                    >
+                        <option value="volunteer">متطوع</option>
+                        <option value="member">عضو</option>
+                    </select>
+                    <p
+                        v-if="form.errors.member_type"
+                        class="text-xs text-red-500 mt-1"
+                    >
+                        {{ form.errors.member_type }}
+                    </p>
                 </div>
 
                 <div>

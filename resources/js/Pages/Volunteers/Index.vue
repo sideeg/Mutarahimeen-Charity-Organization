@@ -1,14 +1,51 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
-import { ref } from "vue";
-import { Eye, Trash2, Plus, FileSpreadsheet } from "lucide-vue-next";
+import { ref, watch } from "vue";
+import { Eye, Trash2, Plus, FileSpreadsheet, X } from "lucide-vue-next";
 
-defineProps({
+const props = defineProps({
     applications: Array,
+    residenceStates: Array,
+    filters: Object,
 });
 
 const activeAppDetail = ref(null);
+
+const statusFilter = ref(props.filters?.status || "");
+const memberTypeFilter = ref(props.filters?.member_type || "");
+const residenceFilter = ref(props.filters?.residence_state || "");
+
+const applyFilters = () => {
+    router.get(
+        "/admin/volunteers",
+        {
+            status: statusFilter.value || undefined,
+            member_type: memberTypeFilter.value || undefined,
+            residence_state: residenceFilter.value || undefined,
+        },
+        { preserveState: true, replace: true }
+    );
+};
+
+watch([statusFilter, memberTypeFilter, residenceFilter], applyFilters);
+
+const clearFilters = () => {
+    statusFilter.value = "";
+    memberTypeFilter.value = "";
+    residenceFilter.value = "";
+};
+
+const exportUrl = () => {
+    const params = new URLSearchParams();
+    if (statusFilter.value) params.set("status", statusFilter.value);
+    if (memberTypeFilter.value)
+        params.set("member_type", memberTypeFilter.value);
+    if (residenceFilter.value)
+        params.set("residence_state", residenceFilter.value);
+    const qs = params.toString();
+    return "/admin/volunteers/export" + (qs ? `?${qs}` : "");
+};
 
 const openAppDetails = (app) => {
     activeAppDetail.value = app;
@@ -21,12 +58,8 @@ const closeAppDetails = () => {
 const updateStatus = (id, newStatus) => {
     router.post(
         "/admin/volunteers/" + id + "/status",
-        {
-            status: newStatus,
-        },
-        {
-            onSuccess: () => closeAppDetails(),
-        }
+        { status: newStatus },
+        { onSuccess: () => closeAppDetails() }
     );
 };
 
@@ -39,7 +72,6 @@ const deleteApplication = (id) => {
 
 <template>
     <AuthenticatedLayout>
-        <!-- Header Actions Layout -->
         <div
             class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4"
         >
@@ -54,7 +86,7 @@ const deleteApplication = (id) => {
             </div>
             <div class="flex items-center gap-3 self-start">
                 <a
-                    href="/admin/volunteers/export"
+                    :href="exportUrl()"
                     class="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg font-bold text-sm hover:bg-emerald-700 transition shadow-sm cursor-pointer"
                 >
                     <FileSpreadsheet class="w-4 h-4" />
@@ -70,6 +102,66 @@ const deleteApplication = (id) => {
             </div>
         </div>
 
+        <!-- Filters -->
+        <div
+            class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap"
+        >
+            <div class="flex-1 min-w-[160px]">
+                <label class="block text-xs font-semibold text-slate-500 mb-1"
+                    >حالة الطلب</label
+                >
+                <select
+                    v-model="statusFilter"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
+                >
+                    <option value="">الكل</option>
+                    <option value="new">جديد</option>
+                    <option value="accepted">مقبول</option>
+                    <option value="rejected">مرفوض</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[160px]">
+                <label class="block text-xs font-semibold text-slate-500 mb-1"
+                    >التصنيف</label
+                >
+                <select
+                    v-model="memberTypeFilter"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
+                >
+                    <option value="">الكل</option>
+                    <option value="member">عضو</option>
+                    <option value="volunteer">متطوع</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[160px]">
+                <label class="block text-xs font-semibold text-slate-500 mb-1"
+                    >مكان الإقامة</label
+                >
+                <select
+                    v-model="residenceFilter"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none"
+                >
+                    <option value="">الكل</option>
+                    <option
+                        v-for="state in residenceStates"
+                        :key="state"
+                        :value="state"
+                    >
+                        {{ state }}
+                    </option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button
+                    @click="clearFilters"
+                    class="flex items-center gap-1 px-3 py-2 text-slate-500 hover:text-red-500 text-xs font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer"
+                >
+                    <X class="w-3.5 h-3.5" />
+                    <span>مسح الفلاتر</span>
+                </button>
+            </div>
+        </div>
+
         <div
             class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
         >
@@ -82,6 +174,7 @@ const deleteApplication = (id) => {
                         <th class="py-4 px-6">بيانات الاتصال</th>
                         <th class="py-4 px-6">مكان الإقامة</th>
                         <th class="py-4 px-6">تخصص المساهمة</th>
+                        <th class="py-4 px-6 text-center">التصنيف</th>
                         <th class="py-4 px-6 text-center">حالة الطلب</th>
                         <th class="py-4 px-6 text-center">مراجعة</th>
                     </tr>
@@ -113,6 +206,22 @@ const deleteApplication = (id) => {
                         </td>
                         <td class="py-4 px-6 font-semibold text-slate-600">
                             {{ app.specialization || "—" }}
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <span
+                                class="inline-block px-3 py-1 rounded-full text-xs font-bold"
+                                :class="
+                                    app.member_type === 'member'
+                                        ? 'bg-purple-100 text-purple-800'
+                                        : 'bg-slate-100 text-slate-700'
+                                "
+                            >
+                                {{
+                                    app.member_type === "member"
+                                        ? "عضو"
+                                        : "متطوع"
+                                }}
+                            </span>
                         </td>
                         <td class="py-4 px-6 text-center">
                             <span
@@ -153,8 +262,8 @@ const deleteApplication = (id) => {
                         </td>
                     </tr>
                     <tr v-if="applications.length === 0">
-                        <td colspan="5" class="py-8 text-center text-slate-400">
-                            لا توجد طلبات تطوع واردة حتى الآن.
+                        <td colspan="7" class="py-8 text-center text-slate-400">
+                            لا توجد طلبات تطوع مطابقة لهذا الفلتر.
                         </td>
                     </tr>
                 </tbody>
@@ -202,10 +311,10 @@ const deleteApplication = (id) => {
                         </div>
                         <div>
                             <span class="text-slate-400 block mb-0.5"
-                                >التخصص المطلوب</span
+                                >الواتساب</span
                             >
-                            <strong class="text-slate-700 text-sm">{{
-                                activeAppDetail.specialization || "غير محدد"
+                            <strong class="text-slate-700 text-sm font-mono">{{
+                                activeAppDetail.whatsapp
                             }}</strong>
                         </div>
                         <div>
@@ -218,10 +327,20 @@ const deleteApplication = (id) => {
                         </div>
                         <div>
                             <span class="text-slate-400 block mb-0.5"
-                                >الواتساب</span
+                                >التخصص المطلوب</span
                             >
-                            <strong class="text-slate-700 text-sm font-mono">{{
-                                activeAppDetail.whatsapp
+                            <strong class="text-slate-700 text-sm">{{
+                                activeAppDetail.specialization || "غير محدد"
+                            }}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block mb-0.5"
+                                >التصنيف</span
+                            >
+                            <strong class="text-slate-700 text-sm">{{
+                                activeAppDetail.member_type === "member"
+                                    ? "عضو"
+                                    : "متطوع"
                             }}</strong>
                         </div>
                     </div>

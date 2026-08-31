@@ -13,6 +13,9 @@ return new class extends Migration
             $table->dropColumn('volunteer_type');
             $table->string('residence_state')->nullable()->after('phone');
             $table->string('whatsapp')->nullable()->after('residence_state');
+            $table->enum('member_type', ['member', 'volunteer'])
+                ->default('volunteer')
+                ->after('status');
         });
     }
 
@@ -21,6 +24,7 @@ return new class extends Migration
         Schema::table('volunteer_applications', function (Blueprint $table) {
             $table->enum('volunteer_type', ['professional', 'digital'])->default('professional');
             $table->dropColumn(['residence_state', 'whatsapp']);
+            $table->dropColumn('member_type');
         });
     }
 };
