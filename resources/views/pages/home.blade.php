@@ -56,7 +56,7 @@
                         {{-- Text Content --}}
                         <div class="text-white text-center lg:text-start">
                             <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-rahma-gold-200 text-xs font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-full mb-4 sm:mb-6">
-                                <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> {{ app()->getLocale()==='en' ? 'Since 2004' : 'منذ عام 2004' }}
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> {{ app()->getLocale()==='en' ? 'Since 2019' : 'منذ عام 2019' }}
                             </span>
                             <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight mb-4 sm:mb-6 tracking-tight">
                                 {{ $before }}
