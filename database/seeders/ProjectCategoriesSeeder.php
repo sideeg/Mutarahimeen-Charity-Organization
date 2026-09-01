@@ -10,11 +10,11 @@ class ProjectCategoriesSeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['ar' => 'المجال الطبي',              'en' => 'Medical Field',            'icon' => 'stethoscope',     'order' => 1],
-            ['ar' => 'التدريب والتطوير',           'en' => 'Training & Development',   'icon' => 'graduation-cap',  'order' => 2],
-            ['ar' => 'مشاريع الدخل الثابت',        'en' => 'Fixed Income Projects',    'icon' => 'briefcase',       'order' => 3],
-            ['ar' => 'البرامج الخيرية الموسمية',    'en' => 'Seasonal Charity Programs','icon' => 'calendar-heart',  'order' => 4],
-            ['ar' => 'توزيع الوجبات والإفطار',      'en' => 'Meal Distribution',        'icon' => 'utensils',        'order' => 5],
+            ['ar' => 'المجال الطبي',                 'en' => 'Medical Field',                'icon' => 'stethoscope',    'order' => 1],
+            ['ar' => 'الإغاثة الموسمية',              'en' => 'Seasonal Relief',              'icon' => 'calendar-heart', 'order' => 2],
+            ['ar' => 'الطوارئ ودعم النازحين',          'en' => 'Emergency & Displacement Support', 'icon' => 'tent',        'order' => 3],
+            ['ar' => 'التمكين الاقتصادي',             'en' => 'Economic Empowerment',         'icon' => 'briefcase',      'order' => 4],
+            ['ar' => 'البرامج الدينية والتعليمية',     'en' => 'Religious & Educational Programs', 'icon' => 'book-open',  'order' => 5],
         ];
 
         foreach ($categories as $cat) {

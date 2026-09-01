@@ -40,7 +40,7 @@ class SocialLinksSeeder extends Seeder
             ],
             [
                 'platform_name' => 'واتساب',
-                'url'           => 'https://wa.me/249900000000',
+                'url'           => 'https://wa.me/256766699449',
                 'icon_name'     => 'whatsapp',
                 'display_order' => 5,
                 'is_active'     => true,
