@@ -187,7 +187,7 @@ const logout = () => {
                 <!-- Volunteers Applications -->
                 <Link
                     v-if="
-                        ['super_admin', 'content_editor'].includes(
+                        ['super_admin', 'membership_manager'].includes(
                             $page.props.auth?.user?.role
                         )
                     "
@@ -518,7 +518,7 @@ const logout = () => {
                     <!-- Volunteers -->
                     <Link
                         v-if="
-                            ['super_admin', 'content_editor'].includes(
+                            ['super_admin', 'membership_manager'].includes(
                                 $page.props.auth?.user?.role
                             )
                         "

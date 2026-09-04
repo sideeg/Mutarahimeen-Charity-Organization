@@ -44,7 +44,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:dashboard_users,email',
             'password' => 'required|min:6',
-            'role' => 'required|in:super_admin,content_editor,finance',
+            'role' => 'required|in:super_admin,content_editor,finance,membership_manager',
             'is_active' => 'required|boolean',
         ]);
 
@@ -75,7 +75,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:dashboard_users,email,' . $user->id,
             'password' => 'nullable|min:6',
-            'role' => 'required|in:super_admin,content_editor,finance',
+            'role' => 'required|in:super_admin,content_editor,finance,membership_manager',
             'is_active' => 'required|boolean',
         ]);
 

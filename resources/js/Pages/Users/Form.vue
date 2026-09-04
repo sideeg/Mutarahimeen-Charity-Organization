@@ -134,6 +134,9 @@ const submit = () => {
                         <option value="finance">
                             مشرف تبرعات مالي (Finance Specialist)
                         </option>
+                        <option value="membership_manager">
+                            مسؤول العضوية والتطوع (Membership Manager)
+                        </option>
                     </select>
                 </div>
 

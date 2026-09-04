@@ -13,7 +13,7 @@ class VolunteerApplicationController extends Controller
     private function authorizeEditor()
     {
         $user = DashboardUser::find(session('dashboard_user_id'));
-        if (!$user || !in_array($user->role, ['super_admin', 'content_editor'])) {
+        if (!$user || !in_array($user->role, ['super_admin', 'membership_manager'])) {
             abort(403, 'غير مصرح لك بمراجعة أو إدارة طلبات المتطوعين.');
         }
     }

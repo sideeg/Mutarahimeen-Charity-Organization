@@ -80,6 +80,8 @@ const deleteUser = (id) => {
                                             user.role === 'content_editor',
                                         'bg-emerald-100 text-emerald-800':
                                             user.role === 'finance',
+                                        'bg-orange-100 text-orange-800':
+                                            user.role === 'membership_manager',
                                     }"
                                 >
                                     {{
@@ -87,6 +89,8 @@ const deleteUser = (id) => {
                                             ? "مدير عام بالنظام"
                                             : user.role === "finance"
                                             ? "المشرف المالي"
+                                            : user.role === "membership_manager"
+                                            ? "مسؤول العضوية"
                                             : "محرر محتوى"
                                     }}
                                 </span>
