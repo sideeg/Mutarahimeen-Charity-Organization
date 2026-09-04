@@ -35,6 +35,7 @@ class AuthController extends Controller
             'captcha'  => 'required|integer',
         ], [
             'email.required'    => 'البريد الإلكتروني مطلوب.',
+            'email.email'       => 'صيغة البريد الإلكتروني غير صحيحة.',
             'password.required' => 'كلمة المرور مطلوبة.',
             'captcha.required'  => 'يرجى إدخال إجابة مسألة الأمان.',
             'captcha.integer'   => 'يجب أن تكون إجابة مسألة الأمان رقماً صحيحاً.',
@@ -42,35 +43,34 @@ class AuthController extends Controller
 
         $expectedCaptcha = session()->get('login_captcha_result');
 
-        // Validate Captcha Answer
-        if (is_null($expectedCaptcha) || (int)$request->captcha !== (int)$expectedCaptcha) {
-            $this->generateCaptcha(); // Regenerate for the next attempt
-            return back()->withErrors(['captcha' => 'إجابة مسألة الأمان غير صحيحة.']);
+        if (is_null($expectedCaptcha) || (int) $request->captcha !== (int) $expectedCaptcha) {
+            $this->generateCaptcha();
+            return back()
+                ->withErrors(['captcha' => 'إجابة مسألة الأمان غير صحيحة، حاول مرة أخرى.'])
+                ->withInput($request->only('email'));
         }
 
         $user = DashboardUser::where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password_hash)) {
-            $this->generateCaptcha(); // Regenerate for security
-            return back()->withErrors(['email' => 'بيانات الاعتماد المدخلة غير صحيحة.']);
+            $this->generateCaptcha();
+            return back()
+                ->withErrors(['credentials' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'])
+                ->withInput($request->only('email'));
         }
 
         if (!$user->is_active) {
             $this->generateCaptcha();
-            return back()->withErrors(['email' => 'هذا الحساب تم إيقافه مؤقتاً.']);
+            return back()
+                ->withErrors(['account' => 'هذا الحساب تم إيقافه مؤقتاً. يرجى التواصل مع مدير النظام.'])
+                ->withInput($request->only('email'));
         }
 
-        // Clean up captcha from session upon login success
         session()->forget('login_captcha_result');
-
         $request->session()->put('dashboard_user_id', $user->id);
         $user->update(['last_login' => now()]);
 
-          return match($user->role) {
-                'membership_manager' => redirect('/admin/volunteers'),
-                'content_editor'     => redirect('/admin/news'), 
-                default               => redirect()->route('admin.index'),
-            };
+        return redirect()->route('admin.index');
     }
 
     public function logout(Request $request)
