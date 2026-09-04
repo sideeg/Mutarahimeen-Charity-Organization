@@ -50,6 +50,11 @@ const logout = () => {
             <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
                 <!-- Dashboard Home -->
                 <Link
+                    v-if="
+                        ['super_admin', 'finance'].includes(
+                            $page.props.auth?.user?.role
+                        )
+                    "
                     href="/admin"
                     class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
                     :class="{
@@ -199,6 +204,11 @@ const logout = () => {
 
                 <!-- Projects -->
                 <Link
+                    v-if="
+                        ['super_admin', 'content_editor', 'finance'].includes(
+                            $page.props.auth?.user?.role
+                        )
+                    "
                     href="/admin/projects"
                     class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
                     :class="{
@@ -231,7 +241,7 @@ const logout = () => {
                 <!-- Updates -->
                 <Link
                     v-if="
-                        ['super_admin', 'content_editor'].includes(
+                        ['super_admin', 'content_editor', 'finance'].includes(
                             $page.props.auth?.user?.role
                         )
                     "
@@ -363,6 +373,11 @@ const logout = () => {
                 <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
                     <!-- Dashboard Home -->
                     <Link
+                        v-if="
+                            ['super_admin', 'finance'].includes(
+                                $page.props.auth?.user?.role
+                            )
+                        "
                         href="/admin"
                         class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
                         :class="{
@@ -521,6 +536,13 @@ const logout = () => {
 
                     <!-- Projects -->
                     <Link
+                        v-if="
+                            [
+                                'super_admin',
+                                'content_editor',
+                                'finance',
+                            ].includes($page.props.auth?.user?.role)
+                        "
                         href="/admin/projects"
                         class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"
                         :class="{
@@ -555,9 +577,11 @@ const logout = () => {
                     <!-- Updates -->
                     <Link
                         v-if="
-                            ['super_admin', 'content_editor'].includes(
-                                $page.props.auth?.user?.role
-                            )
+                            [
+                                'super_admin',
+                                'content_editor',
+                                'finance',
+                            ].includes($page.props.auth?.user?.role)
                         "
                         href="/admin/updates"
                         class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm"

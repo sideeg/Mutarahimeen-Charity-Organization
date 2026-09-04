@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
@@ -8,19 +7,28 @@ use App\Models\Donation;
 use App\Models\VolunteerApplication;
 use App\Models\NewsletterSubscriber;
 use App\Models\SentEmail;
+use App\Models\DashboardUser;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
+    private function authorizeAccess()
+    {
+        $user = DashboardUser::find(session('dashboard_user_id'));
+        if (!$user || !in_array($user->role, ['super_admin', 'finance'])) {
+            abort(403, 'غير مصرح لك بالوصول إلى لوحة النظرة العامة.');
+        }
+    }
+
     public function index()
     {
+        $this->authorizeAccess();
+
         $stats = [
             'total_raised'            => (float) Donation::where('status', 'confirmed')->sum('amount'),
             'pending_donations_count' => Donation::where('status', 'pending')->count(),
             'active_projects'         => Project::where('status', 'active')->count(),
             'volunteer_applications'  => VolunteerApplication::count(),
-            
-            // New Communication Stats
             'total_subscribers'       => NewsletterSubscriber::where('is_active', true)->count(),
             'emails_sent_today'       => SentEmail::whereDate('created_at', now()->today())->count(),
             'total_emails_sent'       => SentEmail::count(),

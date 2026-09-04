@@ -14,7 +14,7 @@ class ProjectUpdateController extends Controller
     private function authorizeEditor()
     {
         $user = DashboardUser::find(session('dashboard_user_id'));
-        if (!$user || !in_array($user->role, ['super_admin', 'content_editor'])) {
+        if (!$user || !in_array($user->role, ['super_admin', 'content_editor','finance'])) {
             abort(403, 'غير مصرح لك بالوصول لمتابعة تحديثات المشاريع.');
         }
     }
