@@ -70,7 +70,11 @@ class AuthController extends Controller
         $request->session()->put('dashboard_user_id', $user->id);
         $user->update(['last_login' => now()]);
 
-        return redirect()->route('admin.index');
+          return match($user->role) {
+                'membership_manager' => redirect('/admin/volunteers'),
+                'content_editor'     => redirect('/admin/news'), 
+                default               => redirect()->route('admin.index'),
+            };
     }
 
     public function logout(Request $request)
