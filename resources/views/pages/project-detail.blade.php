@@ -5,7 +5,7 @@
 
 <section class="relative">
     <div class="h-[420px] overflow-hidden">
-        <img src="{{ $project->coverImage->url ?? 'https://images.unsplash.com/photo-1541913496-2246de0d56c4?auto=format&fit=crop&w=1600&q=80' }}" class="w-full h-full object-cover">
+        <img src="{{ $project->coverImage->url ?? asset('images/placeholder-project.svg') }}" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-rahma-green-900 via-rahma-green-900/40 to-transparent"></div>
     </div>
     <div class="absolute bottom-0 inset-x-0">
@@ -90,7 +90,7 @@
             @foreach($related as $r)
                 <a href="{{ route('projects.show', $r->id) }}" class="group bg-white rounded-3xl overflow-hidden shadow-soft hover:shadow-2xl transition">
                     <div class="h-40 overflow-hidden">
-                        <img src="{{ $r->coverImage->url ?? 'https://images.unsplash.com/photo-1541913496-2246de0d56c4?auto=format&fit=crop&w=800&q=80' }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <img src="{{ $r->coverImage->url ?? asset('images/placeholder-project.svg') }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-5">
                         <h3 class="font-bold text-rahma-green-800 line-clamp-1">{{ $r->title }}</h3>

@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useForm, Link, router } from "@inertiajs/vue3";
-import { ArrowRight, Save, Image, Trash2 } from "lucide-vue-next";
+import { ArrowRight, Save, Image, Trash2, Star } from "lucide-vue-next";
 import { ref } from "vue";
 
 const props = defineProps({
@@ -35,6 +35,8 @@ const form = useForm({
     media_files: [],
 });
 
+const settingCoverId = ref(null);
+
 const handleFilesUpload = (e) => {
     const files = Array.from(e.target.files);
     form.media_files = files;
@@ -49,12 +51,29 @@ const deleteExistingMedia = (mediaId) => {
     }
 };
 
+const setCoverImage = (mediaId) => {
+    settingCoverId.value = mediaId;
+    router.post(
+        "/admin/media/" + mediaId + "/set-cover",
+        {},
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                settingCoverId.value = null;
+            },
+        }
+    );
+};
+
 const submit = () => {
-    if (isEditing) {
-        form.post("/admin/projects/" + props.project.id);
-    } else {
-        form.post("/admin/projects");
-    }
+    const url = isEditing
+        ? "/admin/projects/" + props.project.id
+        : "/admin/projects";
+
+    form.post(url, {
+        forceFormData: true,
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -191,7 +210,8 @@ const submit = () => {
 
                 <div v-if="project?.media?.length > 0" class="mb-4">
                     <span class="block text-xs font-bold text-slate-400 mb-2"
-                        >الصور المحفوظة حالياً بقاعدة البيانات:</span
+                        >الصور المحفوظة حالياً بقاعدة البيانات — اضغط النجمة
+                        لتعيين صورة الغلاف:</span
                     >
                     <div
                         class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4"
@@ -199,18 +219,44 @@ const submit = () => {
                         <div
                             v-for="media in project.media"
                             :key="media.id"
-                            class="relative group rounded-lg overflow-hidden border border-slate-200 bg-slate-100 aspect-video shadow-sm"
+                            class="relative group rounded-lg overflow-hidden border-2 bg-slate-100 aspect-video shadow-sm transition"
+                            :class="
+                                media.is_cover
+                                    ? 'border-orange-500 ring-2 ring-orange-200'
+                                    : 'border-slate-200'
+                            "
                         >
                             <img
                                 :src="media.url"
                                 class="w-full h-full object-cover"
                             />
-                            <div
-                                class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
+
+                            <!-- Cover badge, always visible when this is the current cover -->
+                            <span
+                                v-if="media.is_cover"
+                                class="absolute top-1.5 right-1.5 flex items-center gap-1 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow"
                             >
+                                <Star class="w-3 h-3 fill-white" />
+                                الغلاف
+                            </span>
+
+                            <div
+                                class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2"
+                            >
+                                <button
+                                    v-if="!media.is_cover"
+                                    type="button"
+                                    @click="setCoverImage(media.id)"
+                                    :disabled="settingCoverId === media.id"
+                                    title="تعيين كصورة غلاف"
+                                    class="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition cursor-pointer shadow disabled:opacity-50"
+                                >
+                                    <Star class="w-4 h-4" />
+                                </button>
                                 <button
                                     type="button"
                                     @click="deleteExistingMedia(media.id)"
+                                    title="حذف الصورة"
                                     class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full transition cursor-pointer shadow"
                                 >
                                     <Trash2 class="w-4 h-4" />
@@ -239,7 +285,9 @@ const submit = () => {
                         اختر صوراً جديدة لتحميلها للمشروع
                     </button>
                     <p class="text-[11px] text-slate-400 mt-2">
-                        بإمكانك اختيار صور متعددة معاً (JPG, PNG)
+                        بإمكانك اختيار صور متعددة معاً (JPG, PNG). أول صورة سيتم
+                        رفعها ستصبح صورة الغلاف تلقائياً إذا لم يوجد غلاف
+                        حالياً.
                     </p>
 
                     <div

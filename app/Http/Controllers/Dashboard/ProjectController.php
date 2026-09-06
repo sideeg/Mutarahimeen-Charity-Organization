@@ -14,7 +14,7 @@ class ProjectController extends Controller
     private function checkWriteAccess()
     {
         $user = \App\Models\DashboardUser::find(session('dashboard_user_id'));
-        if (!$user || !in_array($user->role, ['super_admin', 'content_editor','finance'])) {
+        if (!$user || !in_array($user->role, ['super_admin', 'content_editor', 'finance'])) {
             abort(403, 'غير مصرح لك بإجراء تعديلات على المشاريع.');
         }
     }
@@ -61,13 +61,14 @@ class ProjectController extends Controller
         $project = Project::create($validated);
 
         if ($request->hasFile('media_files')) {
-            foreach ($request->file('media_files') as $file) {
+            foreach ($request->file('media_files') as $index => $file) {
                 $path = $file->store('projects', 'public');
                 $project->media()->create([
                     'media_type' => 'image',
                     'url' => '/storage/' . $path,
-                    'is_cover' => false,
-                    'display_order' => 0
+                    // First uploaded image on a brand-new project automatically becomes the cover
+                    'is_cover' => $index === 0,
+                    'display_order' => $index
                 ]);
             }
         }
@@ -89,6 +90,7 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project)
     {
+        
         $this->checkWriteAccess();
         $validated = $request->validate([
             'category_id' => 'required|exists:project_categories,id',
@@ -112,14 +114,33 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
-        if ($request->hasFile('media_files')) {
-            foreach ($request->file('media_files') as $file) {
+       if ($request->hasFile('media_files')) {
+
+            foreach ($request->file('media_files') as $index => $file) {
+
+                if (!$file->isValid()) {
+                    \Log::error('Invalid project image upload', [
+                        'error' => $file->getError(),
+                        'name' => $file->getClientOriginalName(),
+                    ]);
+
+                    continue;
+                }
+
                 $path = $file->store('projects', 'public');
+
+                \Log::info('Project image uploaded', [
+                    'original_name' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'full_path' => storage_path('app/public/' . $path),
+                    'exists' => Storage::disk('public')->exists($path),
+                ]);
+
                 $project->media()->create([
                     'media_type' => 'image',
-                    'url' => '/storage/' . $path,
-                    'is_cover' => false,
-                    'display_order' => 0
+                    'url' => Storage::disk('public')->url($path),
+                    'is_cover' => $index === 0,
+                    'display_order' => $index,
                 ]);
             }
         }
@@ -142,10 +163,39 @@ class ProjectController extends Controller
     public function deleteMedia(ProjectMedia $media)
     {
         $this->checkWriteAccess();
+        $wasCover = $media->is_cover;
+        $projectId = $media->project_id;
+
         $filePath = str_replace('/storage/', '', $media->url);
         Storage::disk('public')->delete($filePath);
         
         $media->delete();
+
+        // If we just deleted the cover photo, promote the next available image automatically
+        // so the project never ends up with zero cover and silently falls back to the placeholder.
+        if ($wasCover) {
+            $nextMedia = ProjectMedia::where('project_id', $projectId)
+                ->orderBy('display_order')
+                ->first();
+
+            if ($nextMedia) {
+                $nextMedia->update(['is_cover' => true]);
+            }
+        }
+
         return back()->with('success', 'تم حذف المرفق بنجاح');
+    }
+
+    /** Mark a specific media item as the project's cover image, unsetting any previous cover */
+    public function setCover(ProjectMedia $media)
+    {
+        $this->checkWriteAccess();
+
+        ProjectMedia::where('project_id', $media->project_id)
+            ->update(['is_cover' => false]);
+
+        $media->update(['is_cover' => true]);
+
+        return back()->with('success', 'تم تعيين صورة الغلاف بنجاح');
     }
 }

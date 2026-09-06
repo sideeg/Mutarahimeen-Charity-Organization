@@ -36,7 +36,7 @@
         @foreach($projects as $project)
             <a href="{{ route('projects.show', $project->id) }}" class="group bg-white rounded-3xl overflow-hidden shadow-soft hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                 <div class="relative h-52 overflow-hidden">
-                    <img src="{{ $project->coverImage->url ?? 'https://images.unsplash.com/photo-1541913496-2246de0d56c4?auto=format&fit=crop&w=800&q=80' }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    <img src="{{ $project->coverImage->url ?? asset('images/placeholder-project.svg') }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     <span class="absolute top-3 {{ app()->getLocale()==='ar' ? 'right-3' : 'left-3' }} bg-rahma-gold-500 text-white text-xs font-bold px-3 py-1 rounded-full">{{ $project->category->name ?? '' }}</span>
                     @if($project->status === 'completed')
                         <span class="absolute top-3 {{ app()->getLocale()==='ar' ? 'left-3' : 'right-3' }} bg-rahma-green-600 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"><i data-lucide="check-circle"></i> {{ app()->getLocale()==='en' ? 'Completed' : 'مكتمل' }}</span>

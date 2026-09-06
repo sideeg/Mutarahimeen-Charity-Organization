@@ -49,6 +49,8 @@ Route::middleware(['dashboard.auth'])->prefix('admin')->name('admin.')->group(fu
     // Individual Media Deletion
     Route::delete('/media/{media}', [App\Http\Controllers\Dashboard\ProjectController::class, 'deleteMedia'])->name('projects.media.destroy');
 
+    Route::post('/media/{media}/set-cover', [\App\Http\Controllers\Dashboard\ProjectController::class, 'setCover'])
+    ->name('admin.media.setCover');
     // Project Categories CRUD (Accessible by: super_admin, content_editor)
     Route::get('/categories', [App\Http\Controllers\Dashboard\ProjectCategoryController::class, 'index']);
     Route::get('/categories/create', [App\Http\Controllers\Dashboard\ProjectCategoryController::class, 'create']);
