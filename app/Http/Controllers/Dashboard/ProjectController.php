@@ -115,35 +115,18 @@ class ProjectController extends Controller
         $project->update($validated);
 
        if ($request->hasFile('media_files')) {
-
             foreach ($request->file('media_files') as $index => $file) {
-
-                if (!$file->isValid()) {
-                    \Log::error('Invalid project image upload', [
-                        'error' => $file->getError(),
-                        'name' => $file->getClientOriginalName(),
-                    ]);
-
-                    continue;
-                }
-
                 $path = $file->store('projects', 'public');
-
-                \Log::info('Project image uploaded', [
-                    'original_name' => $file->getClientOriginalName(),
-                    'path' => $path,
-                    'full_path' => storage_path('app/public/' . $path),
-                    'exists' => Storage::disk('public')->exists($path),
-                ]);
-
                 $project->media()->create([
                     'media_type' => 'image',
-                    'url' => Storage::disk('public')->url($path),
+                    'url' => '/storage/' . $path,
+                    // First uploaded image on a brand-new project automatically becomes the cover
                     'is_cover' => $index === 0,
-                    'display_order' => $index,
+                    'display_order' => $index
                 ]);
             }
         }
+    
 
         return redirect()->route('admin.projects.index')->with('success', 'تم تحديث المشروع بنجاح');
     }
