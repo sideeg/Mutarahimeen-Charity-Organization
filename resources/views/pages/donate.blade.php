@@ -24,26 +24,256 @@
 <section class="max-w-6xl mx-auto px-4 py-16 grid lg:grid-cols-5 gap-10">
 
     {{-- Payment methods --}}
-    <div class="lg:col-span-2 space-y-6">
-        <h2 class="text-xl font-black text-rahma-green-800 mb-2">{{ app()->getLocale()==='en' ? 'Payment Methods' : 'وسائل الدفع' }}</h2>
+    <div class="lg:col-span-2 space-y-5">
+
+        {{-- Section heading --}}
+        <div>
+            <h2 class="text-xl font-black text-rahma-green-800">
+                {{ app()->getLocale() === 'en' ? 'Payment Methods' : 'وسائل الدفع' }}
+            </h2>
+
+            <p class="text-sm text-rahma-green-900/60 mt-1">
+                {{ app()->getLocale() === 'en'
+                    ? 'Choose any of the available payment methods below.'
+                    : 'يمكنك استخدام أي من وسائل الدفع المتاحة أدناه.' }}
+            </p>
+        </div>
+
+        {{-- Payment method cards --}}
         @foreach($paymentMethods as $method)
-            <div class="bg-white rounded-3xl p-6 shadow-soft border-s-4 border-rahma-gold-500">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-11 h-11 rounded-xl bg-rahma-gold-50 flex items-center justify-center">
-                        <i data-lucide="wallet" class="text-rahma-gold-600"></i>
+
+            <div
+                class="group bg-white rounded-3xl p-5 sm:p-6
+                    shadow-soft border border-rahma-green-100
+                    border-s-4 border-s-rahma-gold-500
+                    transition hover:-translate-y-0.5 hover:shadow-lg"
+            >
+
+                {{-- ================= METHOD HEADER ================= --}}
+                <div class="flex items-center gap-3 sm:gap-4 mb-5">
+
+                    {{-- Method Logo --}}
+                    <div
+                        class="w-14 h-14 sm:w-16 sm:h-16 shrink-0
+                            rounded-2xl bg-rahma-gold-50
+                            border border-rahma-gold-100
+                            flex items-center justify-center
+                            overflow-hidden"
+                    >
+                        @if($method->icon_url)
+
+                            <img
+                                src="{{ filter_var($method->icon_url, FILTER_VALIDATE_URL)
+                                    ? $method->icon_url
+                                    : asset($method->icon_url) }}"
+                                alt="{{ $method->method_name }}"
+                                class="w-full h-full object-contain p-2"
+                                loading="lazy"
+                            >
+
+                        @else
+
+                            {{-- Fallback icon --}}
+                            <i
+                                data-lucide="wallet"
+                                class="w-7 h-7 text-rahma-gold-600"
+                            ></i>
+
+                        @endif
                     </div>
-                    <h3 class="font-bold text-rahma-green-800">{{ $method->method_name }}</h3>
+
+                    {{-- Method information --}}
+                    <div class="min-w-0 flex-1">
+
+                        {{-- Method name --}}
+                        <h3
+                            class="font-black text-base sm:text-lg
+                                text-rahma-green-800"
+                        >
+                            {{ $method->method_name }}
+                        </h3>
+
+                        {{-- Account name --}}
+                        @if($method->account_name)
+
+                            <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-sm">
+
+                                <span class="text-rahma-green-900/60">
+                                    {{ app()->getLocale() === 'en'
+                                        ? 'Account Name:'
+                                        : 'اسم الحساب:' }}
+                                </span>
+
+                                <span class="font-bold text-rahma-green-800">
+                                    {{ $method->account_name }}
+                                </span>
+
+                            </div>
+
+                        @endif
+
+                    </div>
+
                 </div>
+
+
+                {{-- ================= ACCOUNT NUMBER ================= --}}
                 @if($method->account_number)
-                    <div class="flex justify-between text-sm bg-rahma-green-50 rounded-xl px-4 py-2 mb-2">
-                        <span class="text-rahma-green-900/60">{{ app()->getLocale()==='en' ? 'Account' : 'رقم الحساب' }}</span>
-                        <span class="font-bold text-rahma-green-800">{{ $method->account_number }}</span>
+
+                    <div
+                        class="rounded-2xl
+                            bg-rahma-green-50
+                            border border-rahma-green-100
+                            p-4 mb-3"
+                    >
+
+                        <div
+                            class="flex flex-col
+                                sm:flex-row
+                                sm:items-center
+                                sm:justify-between
+                                gap-3"
+                        >
+
+                            {{-- Account number --}}
+                            <div class="min-w-0">
+
+                                <span
+                                    class="block text-xs
+                                        text-rahma-green-900/60 mb-1"
+                                >
+                                    {{ app()->getLocale() === 'en'
+                                        ? 'Account / Number'
+                                        : 'رقم الحساب' }}
+                                </span>
+
+                                <span
+                                    class="block font-black
+                                        text-lg sm:text-xl
+                                        tracking-wide
+                                        text-rahma-green-800
+                                        break-all"
+                                    dir="ltr"
+                                >
+                                    {{ $method->account_number }}
+                                </span>
+
+                            </div>
+
+
+                            {{-- Copy button --}}
+                            <button
+                                type="button"
+                                onclick="
+                                    if (navigator.clipboard) {
+                                        navigator.clipboard.writeText(
+                                            @js($method->account_number)
+                                        );
+                                    }
+                                "
+                                class="self-start sm:self-auto
+                                    inline-flex items-center
+                                    justify-center gap-1.5
+                                    rounded-xl
+                                    bg-white
+                                    border border-rahma-green-200
+                                    px-3 py-2
+                                    text-xs font-bold
+                                    text-rahma-green-700
+                                    hover:bg-rahma-green-50
+                                    transition"
+                            >
+
+                                <i
+                                    data-lucide="copy"
+                                    class="w-3.5 h-3.5"
+                                ></i>
+
+                                {{ app()->getLocale() === 'en'
+                                    ? 'Copy'
+                                    : 'نسخ' }}
+
+                            </button>
+
+                        </div>
+
                     </div>
+
                 @endif
-                <p class="text-sm text-rahma-green-900/60">{{ $method->instructions }}</p>
+
+
+                {{-- ================= PAYMENT INSTRUCTIONS ================= --}}
+                @if($method->instructions)
+
+                    <div
+                        class="rounded-2xl
+                            bg-slate-50
+                            border border-slate-100
+                            p-4"
+                    >
+
+                        <div
+                            class="flex items-center gap-2 mb-2"
+                        >
+
+                            <i
+                                data-lucide="info"
+                                class="w-4 h-4
+                                    text-rahma-gold-600"
+                            ></i>
+
+                            <span
+                                class="text-xs font-bold
+                                    text-rahma-green-800"
+                            >
+                                {{ app()->getLocale() === 'en'
+                                    ? 'Payment Instructions'
+                                    : 'تعليمات الدفع' }}
+                            </span>
+
+                        </div>
+
+                        <p
+                            class="text-sm
+                                leading-7
+                                text-rahma-green-900/70
+                                whitespace-pre-line"
+                        >
+                            {{ $method->instructions }}
+                        </p>
+
+                    </div>
+
+                @endif
+
             </div>
+
         @endforeach
+
+
+        {{-- ================= EMPTY STATE ================= --}}
+        @if($paymentMethods->isEmpty())
+
+            <div
+                class="bg-white
+                    rounded-3xl
+                    p-6
+                    border border-dashed
+                    border-rahma-green-200
+                    text-center
+                    text-sm
+                    text-rahma-green-900/60"
+            >
+                {{ app()->getLocale() === 'en'
+                    ? 'No payment methods are currently available.'
+                    : 'لا توجد وسائل دفع متاحة حالياً.' }}
+            </div>
+
+        @endif
+
     </div>
+
+
 
     {{-- Donation form --}}
     <div class="lg:col-span-3">
