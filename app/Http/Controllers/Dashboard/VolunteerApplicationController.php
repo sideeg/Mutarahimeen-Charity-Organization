@@ -55,21 +55,19 @@ class VolunteerApplicationController extends Controller
 
         $validated = $request->validate([
             'full_name'         => 'required|string|max:120',
-            'email'             => 'required|email|max:180',
+            'email'             => 'nullable|email|max:180',
             'phone'             => 'required|string|max:30',
             'whatsapp'          => 'required|string|max:30',
             'residence_state'   => 'required|string|max:100',
             'specialization'    => 'nullable|string|max:120',
-            'message_or_skills' => 'required|string|max:1000',
+            'message_or_skills' => 'nullable|string|max:1000',
             'status'            => 'required|in:new,accepted,rejected',
             'member_type'       => 'required|in:member,volunteer',
         ], [
             'full_name.required'         => 'الاسم الكامل مطلوب.',
-            'email.required'             => 'البريد الإلكتروني مطلوب.',
             'phone.required'             => 'رقم الهاتف مطلوب.',
             'whatsapp.required'          => 'رقم الواتساب مطلوب.',
             'residence_state.required'   => 'مكان الإقامة مطلوب.',
-            'message_or_skills.required' => 'يرجى كتابة الخبرة والأعمال الإنسانية السابقة.',
         ]);
 
         VolunteerApplication::create($validated);

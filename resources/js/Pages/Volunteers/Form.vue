@@ -91,12 +91,11 @@ const submit = () => {
                     <div>
                         <label
                             class="block text-sm font-semibold text-slate-700 mb-2"
-                            >البريد الإلكتروني *</label
-                        >
+                            >البريد الإلكتروني
+                        </label>
                         <input
                             type="email"
                             v-model="form.email"
-                            required
                             class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:outline-none text-left"
                             dir="ltr"
                         />
@@ -248,11 +247,10 @@ const submit = () => {
                 <div>
                     <label
                         class="block text-sm font-semibold text-slate-700 mb-2"
-                        >الخبرة والأعمال الإنسانية السابقة *</label
-                    >
+                        >الخبرة والأعمال الإنسانية السابقة
+                    </label>
                     <textarea
                         v-model="form.message_or_skills"
-                        required
                         rows="4"
                         minlength="10"
                         title="يرجى إدخال وصف لا يقل عن 10 حروف عن الخبرة والأعمال السابقة."
