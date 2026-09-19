@@ -130,6 +130,8 @@ Route::middleware(['dashboard.auth'])->prefix('admin')->name('admin.')->group(fu
     Route::post('/volunteers/{application}/status', [App\Http\Controllers\Dashboard\VolunteerApplicationController::class, 'updateStatus'])->name('volunteers.status');
     Route::delete('/volunteers/{application}', [App\Http\Controllers\Dashboard\VolunteerApplicationController::class, 'destroy'])->name('volunteers.destroy');
     Route::get('/volunteers/export', [App\Http\Controllers\Dashboard\VolunteerApplicationController::class, 'export'])->name('volunteers.export');
+    Route::get('/volunteers/{application}/edit', [App\Http\Controllers\Dashboard\VolunteerApplicationController::class, 'edit']);
+    Route::put('/volunteers/{application}', [App\Http\Controllers\Dashboard\VolunteerApplicationController::class, 'update']);
 });
 
 

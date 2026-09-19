@@ -1,7 +1,17 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useForm, Link } from "@inertiajs/vue3";
+import { computed } from "vue";
 import { ArrowRight, Save } from "lucide-vue-next";
+
+const props = defineProps({
+    application: {
+        type: Object,
+        default: null,
+    },
+});
+
+const isEditing = computed(() => !!props.application);
 
 const sudanStates = [
     "الخرطوم",
@@ -25,19 +35,23 @@ const sudanStates = [
 ];
 
 const form = useForm({
-    full_name: "",
-    email: "",
-    phone: "",
-    whatsapp: "",
-    residence_state: "",
-    specialization: "",
-    message_or_skills: "",
-    status: "accepted",
-    member_type: "volunteer",
+    full_name: props.application?.full_name || "",
+    email: props.application?.email || "",
+    phone: props.application?.phone || "",
+    whatsapp: props.application?.whatsapp || "",
+    residence_state: props.application?.residence_state || "",
+    specialization: props.application?.specialization || "",
+    message_or_skills: props.application?.message_or_skills || "",
+    status: props.application?.status || "accepted",
+    member_type: props.application?.member_type || "volunteer",
 });
 
 const submit = () => {
-    form.post("/admin/volunteers");
+    if (isEditing.value) {
+        form.put(`/admin/volunteers/${props.application.id}`);
+    } else {
+        form.post("/admin/volunteers");
+    }
 };
 </script>
 
@@ -52,11 +66,18 @@ const submit = () => {
             </Link>
             <div>
                 <h2 class="text-2xl font-bold text-slate-800">
-                    إضافة متطوع جديد بالنظام
+                    {{
+                        isEditing
+                            ? "تعديل بيانات المتطوع"
+                            : "إضافة متطوع جديد بالنظام"
+                    }}
                 </h2>
                 <p class="text-slate-500 text-sm mt-1">
-                    تسجيل متطوع جديد مباشرة من الإدارة وتحديد مهاراته وتخصصه
-                    الميداني.
+                    {{
+                        isEditing
+                            ? "تحديث وتعديل بيانات ملف المتطوع ومهاراته المسجلة."
+                            : "تسجيل متطوع جديد مباشرة من الإدارة وتحديد مهاراته وتخصصه الميداني."
+                    }}
                 </p>
             </div>
         </div>
@@ -270,10 +291,12 @@ const submit = () => {
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="flex items-center gap-2 px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-lg shadow-sm transition"
+                    class="flex items-center gap-2 px-6 py-2.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold text-sm rounded-lg shadow-sm transition"
                 >
                     <Save class="w-4 h-4" />
-                    <span>حفظ المتطوع</span>
+                    <span>{{
+                        isEditing ? "حفظ التعديلات" : "حفظ المتطوع"
+                    }}</span>
                 </button>
             </div>
         </form>

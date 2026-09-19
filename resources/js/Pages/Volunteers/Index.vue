@@ -4,6 +4,7 @@ import { Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import {
     Eye,
+    Pencil,
     Trash2,
     Plus,
     FileSpreadsheet,
@@ -320,21 +321,29 @@ const memberTypeLabel = (type) => {
                     </div>
 
                     <div
-                        class="grid grid-cols-2 gap-2 border-t border-slate-100 bg-slate-50/70 p-3"
+                        class="grid grid-cols-3 gap-2 border-t border-slate-100 bg-slate-50/70 p-3"
                     >
                         <button
                             @click="openAppDetails(app)"
                             type="button"
-                            class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-white px-3 text-xs font-bold text-slate-600 ring-1 ring-slate-200 transition hover:text-orange-500"
+                            class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-white px-2 text-xs font-bold text-slate-600 ring-1 ring-slate-200 transition hover:text-orange-500"
                         >
                             <Eye class="h-4 w-4" />
                             مراجعة
                         </button>
 
+                        <Link
+                            :href="`/admin/volunteers/${app.id}/edit`"
+                            class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-white px-2 text-xs font-bold text-blue-600 ring-1 ring-slate-200 transition hover:bg-blue-50"
+                        >
+                            <Pencil class="h-4 w-4" />
+                            تعديل
+                        </Link>
+
                         <button
                             @click="deleteApplication(app.id)"
                             type="button"
-                            class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-white px-3 text-xs font-bold text-red-500 ring-1 ring-slate-200 transition hover:bg-red-50"
+                            class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-white px-2 text-xs font-bold text-red-500 ring-1 ring-slate-200 transition hover:bg-red-50"
                         >
                             <Trash2 class="h-4 w-4" />
                             حذف
@@ -367,7 +376,7 @@ const memberTypeLabel = (type) => {
                             <th class="px-6 py-4">تخصص المساهمة</th>
                             <th class="px-6 py-4 text-center">التصنيف</th>
                             <th class="px-6 py-4 text-center">حالة الطلب</th>
-                            <th class="px-6 py-4 text-center">مراجعة</th>
+                            <th class="px-6 py-4 text-center">الإجراءات</th>
                         </tr>
                     </thead>
 
@@ -450,6 +459,14 @@ const memberTypeLabel = (type) => {
                                         <Eye class="h-4 w-4" />
                                     </button>
 
+                                    <Link
+                                        :href="`/admin/volunteers/${app.id}/edit`"
+                                        title="تعديل"
+                                        class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-blue-600"
+                                    >
+                                        <Pencil class="h-4 w-4" />
+                                    </Link>
+
                                     <button
                                         @click="deleteApplication(app.id)"
                                         type="button"
@@ -505,14 +522,23 @@ const memberTypeLabel = (type) => {
                         </p>
                     </div>
 
-                    <button
-                        @click="closeAppDetails"
-                        type="button"
-                        aria-label="إغلاق"
-                        class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
-                    >
-                        <X class="h-5 w-5" />
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <Link
+                            :href="`/admin/volunteers/${activeAppDetail.id}/edit`"
+                            class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-blue-300 hover:text-blue-600"
+                        >
+                            <Pencil class="h-3.5 w-3.5" />
+                            <span>تعديل</span>
+                        </Link>
+                        <button
+                            @click="closeAppDetails"
+                            type="button"
+                            aria-label="إغلاق"
+                            class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
+                        >
+                            <X class="h-5 w-5" />
+                        </button>
+                    </div>
                 </div>
 
                 <div class="overflow-y-auto p-4 sm:p-6">

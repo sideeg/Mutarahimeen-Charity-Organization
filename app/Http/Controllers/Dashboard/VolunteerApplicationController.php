@@ -75,6 +75,41 @@ class VolunteerApplicationController extends Controller
         return redirect('/admin/volunteers')->with('success', 'تم إضافة المتطوع يدوياً بنجاح');
     }
 
+    public function edit(VolunteerApplication $application)
+    {
+        $this->authorizeEditor();
+
+        return inertia('Volunteers/Form', [
+            'application' => $application,
+        ]);
+    }
+
+    public function update(Request $request, VolunteerApplication $application)
+    {
+        $this->authorizeEditor();
+
+        $validated = $request->validate([
+            'full_name'         => 'required|string|max:120',
+            'email'             => 'nullable|email|max:180',
+            'phone'             => 'required|string|max:30',
+            'whatsapp'          => 'required|string|max:30',
+            'residence_state'   => 'required|string|max:100',
+            'specialization'    => 'nullable|string|max:120',
+            'message_or_skills' => 'nullable|string|max:1000',
+            'status'            => 'required|in:new,accepted,rejected',
+            'member_type'       => 'required|in:member,volunteer',
+        ], [
+            'full_name.required'       => 'الاسم الكامل مطلوب.',
+            'phone.required'           => 'رقم الهاتف مطلوب.',
+            'whatsapp.required'        => 'رقم الواتساب مطلوب.',
+            'residence_state.required' => 'مكان الإقامة مطلوب.',
+        ]);
+
+        $application->update($validated);
+
+        return redirect('/admin/volunteers')->with('success', 'تم تحديث بيانات المتطوع بنجاح');
+    }
+
     public function updateStatus(Request $request, VolunteerApplication $application)
     {
         $this->authorizeEditor();
